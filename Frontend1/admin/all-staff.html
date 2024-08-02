@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Staff Data</title>
+    <link
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" 
+      rel="stylesheet"
+    />
+    
+    <style>
+      body {
+        padding: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- <nav
+    class="navbar navbar-expand-lg navbar-light bg-dark"
+    data-bs-theme="dark"
+  >
+    <a class="navbar-brand" href="#">Mark Entry App</a>
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarNav"
+      aria-controls="navbarNav"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link" href="../admin/student.html">Show All Students</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="../admin/all-staff.html">Show All Staff</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="../admin/courses.html">Show All Courses</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="show-groups.html">Show All Groups</a>
+        </li>
+      </ul>
+
+
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <button class="btn btn-link nav-link" id="logoutBtn">Logout</button>
+        </li>
+      </ul>
+    </div>
+
+  </nav> -->
+
+    <div id="navbar-container"></div>
+    <div class="container">
+      <h1 class="text-center">Staff Data</h1>
+
+      <div class="card mb-3">
+        <div class="card-body">
+          <h5 class="card-title">Add Staff</h5>
+          <form id="add-staff-form">
+            <div class="form-group">
+              <label for="staff-name">Name</label>
+              <input
+                type="text"
+                class="form-control"
+                id="staff-name"
+                placeholder="Enter name"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="staff-email">Email</label>
+              <input
+                type="email"
+                class="form-control"
+                id="staff-email"
+                placeholder="Enter email"
+                required
+              />
+            </div>
+            <button type="submit" class="btn btn-primary">Add staff</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="card-body">
+        <button id="fetch-staff" class="btn btn-primary mb-3">
+          Fetch Staff
+        </button>
+        <table id="staff-table" class="table table-bordered table-striped">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
+    <script>
+      $(document).ready(function () {
+
+        const token = localStorage.getItem("token");
+        if (token) {
+          const decodedToken = jwt_decode(token);
+          const role = decodedToken.role;
+
+          if (role === "admin") {
+            $("#navbar-container").load(
+              "../navbars/admin-navbar.html",
+              function () {
+                $("#logoutBtn").click(function () {
+                  localStorage.removeItem("token");
+                  window.location.href = "../staff-login.html";
+                });
+              }
+            );
+            $("#content").show();
+          } else {
+            $("#unauthorized").show();
+          }
+        } else {
+          window.location.href = "../staff-login.html";
+        }
+
+
+
+        $("#fetch-staff").click(function () {fetchStaff()}
+          );
+        });
+
+        $("#add-staff-form").submit(function (event) {
+          event.preventDefault();
+          addStaff();
+        });
+
+      function fetchStaff() {
+        fetch("http://localhost:5000/staff/staff", {
+          headers: {
+            Authorization:
+              "Bearer " +
+              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxMywidXNlcl9uYW1lIjoidWVyMTIiLCJ1c2VyX2VtYWlsIjoidXNlcjEyQG1haWwuY29tIiwiaWF0IjoxNzIxMzYxMzgyfQ.LbxiCaPI6mmrQdRG0-nK9LDTvB-8VRCYjMAOj0WODv8",
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.status === "success") {
+              const staffs = data.data;
+              const tableBody = $("#staff-table tbody");
+              tableBody.empty(); // Clear previous data
+
+              staffs.forEach((staff) => {
+                const row = `
+                            <tr>
+                                <td>${staff.staff_id}</td>
+                                <td class="editable" contenteditable="false">${staff.staff_name}</td>
+                                <td class="editable" contenteditable="false">${staff.email}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary edit-btn" data-id="${staff.id}">Edit</button>
+                                    <button class="btn btn-sm btn-danger delete-btn" data-id="${staff.id}">Delete</button>
+                                </td>
+                            </tr>
+                        `;
+                tableBody.append(row);
+              });
+
+              // Attach click event handlers for edit and delete buttons
+              $(".edit-btn").click(function () {
+                const id = $(this).data("id");
+                const row = $(this).closest("tr");
+                if ($(this).text() === "Edit") {
+                  row.find(".editable").attr("contenteditable", "true").focus();
+                  $(this).text("Save");
+                } else {
+                  const updatedName = row.find("td").eq(1).text();
+                  const updatedEmail = row.find("td").eq(2).text();
+                  editStaff(id, updatedName, updatedEmail);
+                  row.find(".editable").attr("contenteditable", "false");
+                  $(this).text("Edit");
+                }
+              });
+
+              $(".delete-btn").click(function () {
+                const id = $(this).data("id");
+                deleteStaff(id);
+              });
+            } else {
+              alert("Failed to fetch staff data.");
+            }
+          })
+          .catch((error) => {
+            console.error("Error fetching staff data:", error);
+            alert("Error fetching staff data.");
+          });
+      }
+
+      function addStudent() {
+        const name = $("#staff-name").val();
+        const email = $("#staff-email").val();
+
+        fetch("http://localhost:5000/staff/register", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization:
+              "Bearer " +
+              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxMywidXNlcl9uYW1lIjoidWVyMTIiLCJ1c2VyX2VtYWlsIjoidXNlcjEyQG1haWwuY29tIiwiaWF0IjoxNzIxMzYxMzgyfQ.LbxiCaPI6mmrQdRG0-nK9LDTvB-8VRCYjMAOj0WODv8",
+          },
+          body: JSON.stringify({ name: name, email: email }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.status === "success") {
+              alert("Staff added successfully.");
+              fetchStaff();
+              $("#add-staff-form")[0].reset();
+            } else {
+              alert("Failed to add staff.");
+            }
+          })
+          .catch((error) => {
+            console.error("Error adding staff:", error);
+            alert("Error adding staff.");
+          });
+      }
+
+      function editStaff(id, name, email) {
+        fetch(`http://localhost:5000/staff/staff${id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization:
+              "Bearer " +
+              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxMywidXNlcl9uYW1lIjoidWVyMTIiLCJ1c2VyX2VtYWlsIjoidXNlcjEyQG1haWwuY29tIiwiaWF0IjoxNzIxMzYxMzgyfQ.LbxiCaPI6mmrQdRG0-nK9LDTvB-8VRCYjMAOj0WODv8",
+          },
+          body: JSON.stringify({ name: name, email: email }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.status === "success") {
+              alert("Staff updated successfully.");
+              fetchStudents();
+            } else {
+              alert("Failed to update staff.");
+            }
+          })
+          .catch((error) => {
+            console.error("Error updating staff:", error);
+            alert("Error updating staff.");
+          });
+      }
+
+      function deleteStaff(id) {
+        fetch(`http://localhost:5000/staff/staff/${id}`, {
+          method: "DELETE",
+          headers: {
+            Authorization:
+              "Bearer " +
+              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxMywidXNlcl9uYW1lIjoidWVyMTIiLCJ1c2VyX2VtYWlsIjoidXNlcjEyQG1haWwuY29tIiwiaWF0IjoxNzIxMzYxMzgyfQ.LbxiCaPI6mmrQdRG0-nK9LDTvB-8VRCYjMAOj0WODv8",
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.status === "success") {
+              alert("Staff deleted successfully.");
+              fetchStaff();
+            } else {
+              alert("Failed to delete staff.");
+            }
+          })
+          .catch((error) => {
+            console.error("Error deleting staff:", error);
+            alert("Error deleting staff.");
+          });
+      }
+    </script>
+  
+  </body>
+</html>

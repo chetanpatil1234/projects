@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>courses  Data</title>
+    <link
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" 
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        padding: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <nav
+    class="navbar navbar-expand-lg navbar-light bg-dark"
+    data-bs-theme="dark"
+  >
+    <a class="navbar-brand" href="#">Mark Entry App</a>
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarNav"
+      aria-controls="navbarNav"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link" href="../admin/student.html">Show All Students</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="../admin/all-staff.html">Show All Staff</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="../admin/courses.html">Show All Courses</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="show-groups.html">Show All Groups</a>
+        </li>
+      </ul>
+
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+
+          
+          <button class="btn btn-link nav-link" id="logoutBtn">Logout</button>
+        </li>
+      </ul>
+    </div>
+  </nav>
+    <div class="container">
+      <h1 class="text-center">course Data</h1>
+
+      <div class="card mb-3">
+        <div class="card-body">
+          <h5 class="card-title">Add course</h5>
+          <form id="add-course-form">
+            <div class="form-group">
+              <label for="course-name">Name</label>
+              <input
+                type="text"
+                class="form-control"
+                id="course-name"
+                placeholder="Enter course-name"
+                required
+              />
+            <!-- </div>
+            <div class="form-group">
+              <label for="student-email"></label>
+              <input
+                type="email"
+                class="form-control"
+                id="student-email"
+                placeholder="Enter email"
+                required
+              />
+            </div> -->
+            <button type="submit" class="btn btn-primary">Add course</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="card-body">
+        <button id="fetch-courses" class="btn btn-primary mb-3">
+          Fetch courses
+        </button>
+        <table id="courses-table" class="table table-bordered table-striped">
+          <thead>
+            <tr>
+              <th>course_id</th>
+              <th>course_Name</th>
+              <th>description</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+      $(document).ready(function () {
+        $("#fetch-courses").click(function () {
+          fetchcourses();
+        });
+
+        $("#add-course-form").submit(function (event) {
+          event.preventDefault();
+          addcourses();
+        });
+      });
+
+      function fetchcourses() {
+        fetch("http://localhost:5000/course_group/courses", {
+          headers: {
+            Authorization:
+              "Bearer " +
+              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxMywidXNlcl9uYW1lIjoidWVyMTIiLCJ1c2VyX2VtYWlsIjoidXNlcjEyQG1haWwuY29tIiwiaWF0IjoxNzIxMzYxMzgyfQ.LbxiCaPI6mmrQdRG0-nK9LDTvB-8VRCYjMAOj0WODv8",
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            debugger
+            if (data.status === "success") {
+              const courses= data.data;
+              const tableBody = $("#courses-table tbody");
+              tableBody.empty(); // Clear previous data
+
+        
+
+              courses.forEach((courses) => {
+                const row = `
+                            <tr>
+                                <td>${courses.course_id}</td>
+                                <td class="editable" contenteditable="false">${courses.course_name}</td>
+                                <td class="editable" contenteditable="false">${courses.description}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary edit-btn" data-id="${courses.id}">Edit</button>
+                                    <button class="btn btn-sm btn-danger delete-btn" data-id="${courses.id}">Delete</button>
+                                </td>
+                            </tr>
+                        `;
+                tableBody.append(row);
+              });
+
+              // Attach click event handlers for edit and delete buttons
+              $(".edit-btn").click(function () {
+                const id = $(this).data("id");
+                const row = $(this).closest("tr");
+                if ($(this).text() === "Edit") {
+                  row.find(".editable").attr("contenteditable", "true").focus();
+                  $(this).text("Save");
+                } else {
+                  const updatedName = row.find("td").eq(1).text();
+                  const updatedEmail = row.find("td").eq(2).text();
+                  editcourses(id, updatedName, updatedEmail);
+                  row.find(".editable").attr("contenteditable", "false");
+                  $(this).text("Edit");
+                }
+              });
+
+              $(".delete-btn").click(function () {
+                const id = $(this).data("id");
+                deletecourses(id);
+              });
+            } else {
+              alert("Failed to fetch courses data.");
+            }
+          })
+          .catch((error) => {
+            console.error("Error fetching courses data:", error);
+            alert("Error fetching courses data.");
+          });
+      }
+
+      function addcourses() {
+        debugger
+        const name = $("#course-name").val();
+
+        fetch("http://localhost:5000/course_group/courses", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization:
+              "Bearer " +
+              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxMywidXNlcl9uYW1lIjoidWVyMTIiLCJ1c2VyX2VtYWlsIjoidXNlcjEyQG1haWwuY29tIiwiaWF0IjoxNzIxMzYxMzgyfQ.LbxiCaPI6mmrQdRG0-nK9LDTvB-8VRCYjMAOj0WODv8",
+          },
+          body: JSON.stringify({ course_name: name,description:"description" }),
+
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.status === "success") {
+              alert("courses added successfully.");
+              fetchStudents();
+              $("#add-courses-form")[0].reset();
+            } else {
+              alert("Failed to add courses.");
+            }
+          })
+          .catch((error) => {
+            console.error("Error adding courses:", error);
+            alert("Error adding courses.");
+          });
+      }
+
+      function editcourses(id, name) {
+        fetch(`http://localhost:5000/course_group/courses${id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization:
+              "Bearer " +
+              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxMywidXNlcl9uYW1lIjoidWVyMTIiLCJ1c2VyX2VtYWlsIjoidXNlcjEyQG1haWwuY29tIiwiaWF0IjoxNzIxMzYxMzgyfQ.LbxiCaPI6mmrQdRG0-nK9LDTvB-8VRCYjMAOj0WODv8",
+          },
+          body: JSON.stringify({ name: name }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.status === "success") {
+              alert("course updated successfully.");
+              fetchcourses();
+            } else {
+              alert("Failed to update course.");
+            }
+          })
+          .catch((error) => {
+            console.error("Error updating course:", error);
+            alert("Error updating course.");
+          });
+      }
+
+      function deleteStudent(id) {
+        fetch(`http://localhost:5000/course_group/course${id}`, {
+          method: "DELETE",
+          headers: {
+            Authorization:
+              "Bearer " +
+              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxMywidXNlcl9uYW1lIjoidWVyMTIiLCJ1c2VyX2VtYWlsIjoidXNlcjEyQG1haWwuY29tIiwiaWF0IjoxNzIxMzYxMzgyfQ.LbxiCaPI6mmrQdRG0-nK9LDTvB-8VRCYjMAOj0WODv8",
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.status === "success") {
+              alert("course deleted successfully.");
+              fetchStudents();
+            } else {
+              alert("Failed to delete course.");
+            }
+          })
+          .catch((error) => {
+            console.error("Error deleting course:", error);
+            alert("Error deleting course.");
+          });
+      }
+    </script>
+  </body>
+</html>

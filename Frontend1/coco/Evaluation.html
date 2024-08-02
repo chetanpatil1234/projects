@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Data</title>
+    <link
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" 
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        padding: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="text-center">ADD TASK</h1>
+
+      <div class="card mb-3">
+        <div class="card-body">
+          <h5 class="card-title">Add evalueation</h5>
+          <form id="assign-task">
+         <div class="form-group">
+              <label for="subject-name"> subject Name</label>
+              <select  id="select-subject" class="form-select" aria-label="Default select example">
+                <option selected>select subject</option>
+                <option value="core java">core java</option>
+                <option value="2">advanced java</option>
+                <option value="3">data structure</option>
+                <option value="4">dbt</option>
+                <option value="5">operating system</option>
+                <option value="6">.net</option>
+                <option value="7">mobile programming</option>
+                <option value="8">hybrid</option>
+              </select>
+              <div class="form-group">
+              <label for="course-name"> course Name</label>
+              <select  id="select-course" class="form-select" aria-label="Default select example">
+                <option selected>select course</option>
+                <option value="DAC">DAC</option>
+                <option value="DMC">DMC</option>
+                <option value="DESD">DESD</option>
+                <option value="DITISS">DITISS</option>
+                <option value="DBDA">DBDA</option>
+              </select>
+              </div>
+               <!-- <input
+                type="text"
+                class="form-control"
+                id="subject-name"
+                placeholder="Enter subject name"
+                required
+               
+
+              /> -->
+            </div>
+            <div class="form-group">
+              <label for="group-name">group-name</label>
+              <select  id="select-group" class="form-select" aria-label="Default select example">
+                <option selected>select GROUP</option>
+                <option value="D1">D1</option>
+                <option value="D2">D2</option>
+                <option value="D3">D3</option>
+                <option value="D4">D4</option>
+                <option value="D5">D5</option>
+              </select>
+              <div class="form-group">
+                <label for="group-name"><staff-name</label>
+                <select id="select-staff" class="form-select" aria-label="Default select example">
+                    <option selected>select staff-name</option>
+                    <option value="admin">admin</option>
+                    <option value="s1">s1</option>
+                    <option value="s2">s2</option>
+                    <option value="s3">s3</option>
+                    <option value="s4">s4</option>
+                    <option value="s5">s5</option>
+                  </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Assign TASK</button>
+          </form>
+        </div>
+      </div>
+      <h5 class="card-title">select list :</h5>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+        <label class="form-check-label" for="flexCheckDefault">
+          Theory
+        </label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" checked>
+        <label class="form-check-label" for="flexCheckChecked">
+          LAB
+        </label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" checked>
+        <label class="form-check-label" for="flexCheckChecked">
+          IA1
+        </label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" checked>
+        <label class="form-check-label" for="flexCheckChecked">
+          IA2
+        </label>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+      $(document).ready(function () {
+        //  $("#assign-task").click(function () {
+          
+        //  });
+
+         $("#assign-task").submit(function (event) {
+           event.preventDefault();
+           assign_task();
+         });
+       });
+
+    //   function fetchStudents() {
+    //     fetch("http://localhost:5000/user/students", {
+    //       headers: {
+    //         Authorization:
+    //           "Bearer " +
+    //           "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxMywidXNlcl9uYW1lIjoidWVyMTIiLCJ1c2VyX2VtYWlsIjoidXNlcjEyQG1haWwuY29tIiwiaWF0IjoxNzIxMzYxMzgyfQ.LbxiCaPI6mmrQdRG0-nK9LDTvB-8VRCYjMAOj0WODv8",
+    //       },
+    //     })
+    //       .then((response) => response.json())
+    //       .then((data) => {
+    //         if (data.status === "success") {
+    //           const students = data.data;
+    //           const tableBody = $("#student-table tbody");
+    //           tableBody.empty(); // Clear previous data
+
+    //           students.forEach((student) => {
+    //             const row = `
+    //                         <tr>
+    //                             <td>${student.student_id}</td>
+    //                             <td class="editable" contenteditable="false">${student.student_name}</td>
+    //                             <td class="editable" contenteditable="false">${student.email}</td>
+    //                             <td>
+    //                                 <button class="btn btn-sm btn-primary edit-btn" data-id="${student.id}">Edit</button>
+    //                                 <button class="btn btn-sm btn-danger delete-btn" data-id="${student.id}">Delete</button>
+    //                             </td>
+    //                         </tr>
+    //                     `;
+    //             tableBody.append(row);
+    //           });
+
+    //           // Attach click event handlers for edit and delete buttons
+    //           $(".edit-btn").click(function () {
+    //             const id = $(this).data("id");
+    //             const row = $(this).closest("tr");
+    //             if ($(this).text() === "Edit") {
+    //               row.find(".editable").attr("contenteditable", "true").focus();
+    //               $(this).text("Save");
+    //             } else {
+    //               const updatedName = row.find("td").eq(1).text();
+    //               const updatedEmail = row.find("td").eq(2).text();
+    //               editStudent(id, updatedName, updatedEmail);
+    //               row.find(".editable").attr("contenteditable", "false");
+    //               $(this).text("Edit");
+    //             }
+    //           });
+
+    //           $(".delete-btn").click(function () {
+    //             const id = $(this).data("id");
+    //             deleteStudent(id);
+    //           });
+    //         } else {
+    //           alert("Failed to fetch student data.");
+    //         }
+    //       })
+    //       .catch((error) => {
+    //         console.error("Error fetching student data:", error);
+    //         alert("Error fetching student data.");
+    //       });
+    //   }
+
+      function assign_task() {
+        const s_name = $("#select-subject").val();
+        const c_name = $("#select-course").val();
+        const g_name = $("#select-group").val();
+        const staff_name = $("#select-staff").val();
+        console.log("staff_name",staff_name);
+
+        fetch("http://localhost:5000/coco/assign-task", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization:
+              "Bearer " +
+              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxMywidXNlcl9uYW1lIjoidWVyMTIiLCJ1c2VyX2VtYWlsIjoidXNlcjEyQG1haWwuY29tIiwiaWF0IjoxNzIxMzYxMzgyfQ.LbxiCaPI6mmrQdRG0-nK9LDTvB-8VRCYjMAOj0WODv8",
+          },
+          body: JSON.stringify({ subject_name:s_name,
+            course_name:c_name,
+            group_name:g_name,
+            staff_name:staff_name }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.status === "success") {
+              alert("task  added successfully.");
+          
+              $("#assign-task-form")[0].reset();
+            } else {
+              alert("Failed to assign task.");
+            }
+          })
+          .catch((error) => {
+            console.error("Error assing task:", error);
+            alert("Error assing task.");
+          });
+      }
+
+      function editStudent(id, name, email) {
+        fetch(`http://localhost:5000/user/students/${id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization:
+              "Bearer " +
+              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxMywidXNlcl9uYW1lIjoidWVyMTIiLCJ1c2VyX2VtYWlsIjoidXNlcjEyQG1haWwuY29tIiwiaWF0IjoxNzIxMzYxMzgyfQ.LbxiCaPI6mmrQdRG0-nK9LDTvB-8VRCYjMAOj0WODv8",
+          },
+          body: JSON.stringify({ name: name, email: email }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.status === "success") {
+              alert("Student updated successfully.");
+              fetchStudents();
+            } else {
+              alert("Failed to update student.");
+            }
+          })
+          .catch((error) => {
+            console.error("Error updating student:", error);
+            alert("Error updating student.");
+          });
+      }
+
+      function deleteStudent(id) {
+        fetch(`http://localhost:5000/user/students/${id}`, {
+          method: "DELETE",
+          headers: {
+            Authorization:
+              "Bearer " +
+              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxMywidXNlcl9uYW1lIjoidWVyMTIiLCJ1c2VyX2VtYWlsIjoidXNlcjEyQG1haWwuY29tIiwiaWF0IjoxNzIxMzYxMzgyfQ.LbxiCaPI6mmrQdRG0-nK9LDTvB-8VRCYjMAOj0WODv8",
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.status === "success") {
+              alert("task deleted successfully.");
+              fetchStudents();
+            } else {
+              alert("Failed to delete task.");
+            }
+          })
+          .catch((error) => {
+            console.error("Error deleting task:", error);
+            alert("Error deleting task.");
+          });
+      }
+    </script>
+  </body>
+</html>
